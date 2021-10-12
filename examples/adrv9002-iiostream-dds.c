@@ -338,8 +338,8 @@ static int configure_tx_dds(long long freq_val, double scale_val, uint16_t chann
 		info("adrv9002 altvoltage6 scale: %lf\n", scale_val);
 	}
 
-		iio_channel_enable(chan_i);
-		iio_channel_enable(chan_q);
+	iio_channel_enable(chan_i);
+	iio_channel_enable(chan_q);
 
 	return 0;
 }
@@ -349,7 +349,7 @@ static void stream(void)
 {
 	const struct iio_channel *rx_i_chan = rx_chan[I_CHAN];
 	ssize_t nrx = 0;
-	const bool print_val = false;
+	const bool print_val = true;
 
 	info("* Starting IO streaming (press CTRL+C to cancel)\n");
 	sleep(5);
@@ -379,7 +379,7 @@ static void stream(void)
 			p_dat[1] = i;
 
 			if (print_val)
-				printf("q_data = %d\t\ti_data = %d\n", p_dat[0], p_dat[1]);
+				printf("Voltage (Q) = %d\t\t\tVoltage (I) = %d\n", p_dat[0], p_dat[1]);
 		}
 
 		info("Refilling RX buffer in 5 seconds. Press Ctrl+C to exit...\n");
