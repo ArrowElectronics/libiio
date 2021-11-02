@@ -31,8 +31,7 @@
 /** TX DAC Output Mode Selector
  *  Select internal data sources. Supported values are:
  *  - 0 (0x00): internal tone (DDS)
- *  - 1 (0x01): pattern (SED)
- *  - 2 (0x02): input data (DMA Buffer)
+ *  - 2 (0x02): input data (DAC/DMA Buffer)
  *  - 3 (0x03): 0x00 (Standby)
  *  - 6 (0x06): pn7 (standard O.150)
  *  - 7 (0x07): pn15 (standard O.150)
@@ -53,7 +52,6 @@ enum {
 	Q_CHAN
 };
 
-#if (TX_DAC_MODE == 2)
 const uint32_t sine_lut_iq[1024] = {
 	0x00002666, 0x01E2265A, 0x03C32636, 0x05A225FB, 0x077D25A9,
 	0x0954253F, 0x0B2524BE, 0x0CEF2427, 0x0EB12379, 0x106A22B6,
@@ -264,7 +262,6 @@ const uint32_t sine_lut_iq[1024] = {
 	0xF14F2379, 0xF3112427, 0xF4DB24BE, 0xF6AC253F, 0xF88325A9,
 	0xFA5E25FB, 0xFC3D2636, 0xFE1E265A
 };
-#endif
 
 #ifdef _WIN32
 #include <windows.h>
@@ -363,6 +360,12 @@ static int configure_trx_lo(void)
 
 	info("adrv9002 sampling_frequency: %lld\n", val);
 
+	/* Set TX hardwaregain to -24 */
+	val = -24;
+	ret = iio_channel_attr_write_longlong(chan, "hardwaregain", val);
+	if (ret)
+		return 0;
+
 	/* set the LO to 2.5GHz */
 	val = GHZ(2.5);
 	chan = iio_device_find_channel(phy, "altvoltage2", true);
@@ -431,6 +434,10 @@ static int dds_single_tone(long long freq_val, double scale_val, uint16_t channe
 		if (ret)
 		return ret;
 
+		ret = iio_channel_attr_write_longlong(chan_i, "phase", 90000);
+		if (ret)
+			return ret;
+
 		// Find TX1_Q_F1 channel attributes
 		chan_q = iio_device_find_channel(tx, "altvoltage2", true);
 		if (!chan_q) {
@@ -462,6 +469,10 @@ static int dds_single_tone(long long freq_val, double scale_val, uint16_t channe
 		ret = iio_channel_attr_write_double(chan_i, "scale", scale_val);
 		if (ret)
 		return ret;
+
+		ret = iio_channel_attr_write_longlong(chan_i, "phase", 90000);
+		if (ret)
+			return ret;
 
 		// Find TX2_Q_F1 channel attributes
 		chan_q = iio_device_find_channel(tx, "altvoltage6", true);
@@ -539,6 +550,10 @@ static int dds_dual_tone(long long freq_val1, double scale_val1,
 		if (ret)
 		return ret;
 
+		ret = iio_channel_attr_write_longlong(chan_i, "phase", 90000);
+		if (ret)
+			return ret;
+
 		// Find TX1_Q_F1 channel attributes
 		chan_q = iio_device_find_channel(tx, "altvoltage2", true);
 		if (!chan_q) {
@@ -551,10 +566,6 @@ static int dds_dual_tone(long long freq_val1, double scale_val1,
 			return ret;
 
 		ret = iio_channel_attr_write_double(chan_q, "scale", scale_val1);
-		if (ret)
-			return ret;
-
-		ret = iio_channel_attr_write_longlong(chan_q, "phase", 90000);
 		if (ret)
 			return ret;
 
@@ -574,6 +585,10 @@ static int dds_dual_tone(long long freq_val1, double scale_val1,
 		if (ret)
 		return ret;
 
+		ret = iio_channel_attr_write_longlong(chan_i, "phase", 90000);
+		if (ret)
+			return ret;
+
 		// Find TX1_Q_F2 channel attributes
 		chan_q = iio_device_find_channel(tx, "altvoltage3", true);
 		if (!chan_q) {
@@ -588,11 +603,6 @@ static int dds_dual_tone(long long freq_val1, double scale_val1,
 		ret = iio_channel_attr_write_double(chan_q, "scale", scale_val2);
 		if (ret)
 			return ret;
-
-		ret = iio_channel_attr_write_longlong(chan_q, "phase", 90000);
-		if (ret)
-			return ret;
-
 	}
 	else {
 		// Find TX2_I_F1 channel attributes
@@ -610,6 +620,10 @@ static int dds_dual_tone(long long freq_val1, double scale_val1,
 		if (ret)
 		return ret;
 
+		ret = iio_channel_attr_write_longlong(chan_i, "phase", 90000);
+		if (ret)
+			return ret;
+
 		// Find TX2_Q_F1 channel attributes
 		chan_q = iio_device_find_channel(tx, "altvoltage6", true);
 		if (!chan_q) {
@@ -622,10 +636,6 @@ static int dds_dual_tone(long long freq_val1, double scale_val1,
 			return ret;
 
 		ret = iio_channel_attr_write_double(chan_q, "scale", scale_val1);
-		if (ret)
-			return ret;
-
-		ret = iio_channel_attr_write_longlong(chan_q, "phase", 90000);
 		if (ret)
 			return ret;
 
@@ -644,6 +654,10 @@ static int dds_dual_tone(long long freq_val1, double scale_val1,
 		if (ret)
 		return ret;
 
+		ret = iio_channel_attr_write_longlong(chan_i, "phase", 90000);
+		if (ret)
+			return ret;
+
 		// Find TX2_Q_F2 channel attributes
 		chan_q = iio_device_find_channel(tx, "altvoltage7", true);
 		if (!chan_q) {
@@ -659,9 +673,6 @@ static int dds_dual_tone(long long freq_val1, double scale_val1,
 		if (ret)
 			return ret;
 
-		ret = iio_channel_attr_write_longlong(chan_q, "phase", 90000);
-		if (ret)
-			return ret;
 	}
 
 	iio_channel_enable(chan_i);
@@ -714,6 +725,55 @@ static int stream_channels_get_enable(const struct iio_device *dev, struct iio_c
 	return 0;
 }
 
+static void initial_stream(void)
+{
+	const struct iio_channel *rx_i_chan = rx_chan[I_CHAN];
+	const struct iio_channel *tx_i_chan = tx_chan[I_CHAN];
+	uint32_t i;
+
+	ssize_t nbytes_rx;
+	int16_t *p_dat, *p_end;
+	ptrdiff_t p_inc;
+
+	ssize_t nbytes_tx;
+	nbytes_tx = iio_buffer_push(txbuf);
+	if (nbytes_tx < 0) {
+		error("Error pushing buf %zd\n", nbytes_tx);
+		return;
+	}
+
+	nbytes_rx = iio_buffer_refill(rxbuf);
+	if (nbytes_rx < 0) {
+		error("Error refilling buf %zd\n", nbytes_rx);
+		return;
+	}
+
+	/* READ: Get pointers to RX buf and read IQ from RX buf port 0 */
+	p_inc = iio_buffer_step(rxbuf);
+	p_end = iio_buffer_end(rxbuf);
+	for (p_dat = iio_buffer_first(rxbuf, rx_i_chan); p_dat < p_end;
+	     p_dat += p_inc / sizeof(*p_dat)) {
+		/* Example: swap I and Q */
+		int16_t i = p_dat[0];
+		int16_t q = p_dat[1];
+
+		p_dat[0] = q;
+		p_dat[1] = i;
+	}
+
+	/* WRITE: Get pointers to TX buf and write IQ to TX buf port 0 */
+	p_inc = iio_buffer_step(txbuf);
+	p_end = iio_buffer_end(txbuf);
+	for (p_dat = iio_buffer_first(txbuf, tx_i_chan), i = 0; p_dat < p_end;
+	     p_dat += p_inc / sizeof(*p_dat), i++) {
+		if (i == 1024)
+			i = 0;
+
+		p_dat[0] = (int16_t) (sine_lut_iq[i] >> 16); 	/* Real (I) */
+		p_dat[1] = (int16_t) (sine_lut_iq[i]);		/* Imag (Q) */
+	}
+}
+
 static void stream(void)
 {
 	const struct iio_channel *rx_i_chan = rx_chan[I_CHAN];
@@ -736,9 +796,6 @@ static void stream(void)
 			return;
 		}
 #endif
-		info("Refilling RX buffer in 5 seconds. Press Ctrl+C to exit...\n");
-		sleep(5);
-
 		nbytes_rx = iio_buffer_refill(rxbuf);
 		if (nbytes_rx < 0) {
 			error("Error refilling buf %zd\n", nbytes_rx);
@@ -757,7 +814,11 @@ static void stream(void)
 			p_dat[0] = q;
 			p_dat[1] = i;
 
-			printf("Voltage (Q) = %d		Voltage (I) = %d\n", p_dat[0], p_dat[1]);
+#if (TX_DAC_MODE == 0) | (TX_DAC_MODE == 2)
+			printf("Voltage (Q) = %d			tVoltage (I) = %d\n", p_dat[0], p_dat[1]);
+#else
+			printf("Voltage (I) = %d\n", p_dat[1]);
+#endif
 		}
 
 #if (TX_DAC_MODE == 2)
@@ -766,15 +827,18 @@ static void stream(void)
 		p_end = iio_buffer_end(txbuf);
 		for (p_dat = iio_buffer_first(txbuf, tx_i_chan), i = 0; p_dat < p_end;
 		     p_dat += p_inc / sizeof(*p_dat), i++) {
-			if (i == 1024)
+			if (i = 1024)
 				i = 0;
 
-			p_dat[0] = (uint16_t) (sine_lut_iq[i] >> 16); /* Real (I) */
-			p_dat[1] = (uint16_t) (sine_lut_iq[i]); /* Imag (Q) */
+			p_dat[0] = (int16_t) (sine_lut_iq[i] >> 16); 	/* Real (I) */
+			p_dat[1] = (int16_t) (sine_lut_iq[i]); 		/* Imag (Q) */
 		}
 #endif
+		info("Refilling buffers in 5 seconds. Press Ctrl+C to exit...\n\n");
+		sleep(5);
 	}
 }
+
 
 /* simple configuration and streaming */
 /* usage:
@@ -817,7 +881,7 @@ int main(int argc, char **argv)
 	}
 
 	/* Enable digital loopback */
-	//iio_device_debug_attr_write(phy, "tx0_ssi_test_mode_loopback_en", "1");
+	iio_device_debug_attr_write(phy, "tx0_ssi_test_mode_loopback_en", "1");
 
 	tx = iio_context_find_device(ctx, "axi-adrv9002-tx-lpc");
 	if (!tx) {
@@ -825,13 +889,14 @@ int main(int argc, char **argv)
 		goto clean;
 	}
 
+	/* Set TX DAC mode register with the TX_DAC_MODE value */
 	iio_device_reg_write(tx, DAC_MODE_REGISTER, TX_DAC_MODE);
 	iio_device_reg_read(tx, DAC_MODE_REGISTER, &reg_val);
-	printf("reg_val = 0x%x\n", reg_val);
+	printf("Register 0x418 = 0x%x\n", reg_val);
 
-#if (TX_DAC_MODE == 0)
+#if !(TX_DAC_MODE)
 	/* Generate a DDS single tone waveform */
-	ret = dds_single_tone(5000, 0.4, 0);
+	ret = dds_single_tone(10000, 0.5, 0);
 	if (ret)
 		goto clean;
 #endif
@@ -846,11 +911,11 @@ int main(int argc, char **argv)
 	if (ret)
 		goto clean;
 
-#if (TX_DAC_MODE == 2)
 	ret = stream_channels_get_enable(tx, tx_chan, true);
 	if (ret)
 		goto clean;
 
+#if (TX_DAC_MODE == 2)
 	txbuf = iio_device_create_buffer(tx, 1024 * 1024, false);
 	if (!txbuf) {
 		error("Could not create TX buffer: %s\n", strerror(errno));
@@ -866,10 +931,14 @@ int main(int argc, char **argv)
 		goto clean;
 	}
 
-	stream();
 
-	/* Disable digital loopback if enabled */
-	iio_device_debug_attr_write(phy, "tx0_ssi_test_mode_loopback_en", "0");
+#if (TX_DAC_MODE == 2)
+	/* Discard initial set of data */
+	initial_stream();
+#endif
+
+	/* Get RX buffer output*/
+	stream();
 
 clean:
 	cleanup();
