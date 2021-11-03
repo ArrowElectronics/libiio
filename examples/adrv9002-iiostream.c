@@ -882,6 +882,7 @@ int main(int argc, char **argv)
 
 	/* Enable digital loopback */
 	iio_device_debug_attr_write(phy, "tx0_ssi_test_mode_loopback_en", "1");
+	iio_device_debug_attr_write(phy, "tx1_ssi_test_mode_loopback_en", "1");
 
 	tx = iio_context_find_device(ctx, "axi-adrv9002-tx-lpc");
 	if (!tx) {
@@ -939,6 +940,10 @@ int main(int argc, char **argv)
 
 	/* Get RX buffer output*/
 	stream();
+
+	/* Disable digital loopback if enabled */
+	iio_device_debug_attr_write(phy, "tx0_ssi_test_mode_loopback_en", "0");
+	iio_device_debug_attr_write(phy, "tx1_ssi_test_mode_loopback_en", "0");
 
 clean:
 	cleanup();
