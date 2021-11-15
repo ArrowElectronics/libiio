@@ -29,6 +29,54 @@ It takes the uri as the only argument. for example : `./ad9371-iiostream ip:192.
 This example libiio program is meant to exercise the features of IIO functionality on the ADRV9009.
 It takes the uri as the only argument. for example : `./adrv9009-iiostream ip:192.168.2.1`
 
+## ad7768-1-iiostream
+  * Language : C
+
+This example libiio program is meant to exercise the features of IIO functionality on the AD7768-1.
+It takes the uri as the only argument. for example : `./ad7768-1-iiostream ip:192.168.2.1`
+
+## ad7768-iiostream
+  * Language : C
+
+This example libiio program is meant to exercise the features of IIO functionality on the AD7768.
+It takes the uri as the only argument. for example : `./ad7768-iiostream ip:192.168.2.1`
+
+## ad4020-iiostream
+  * Language : C
+
+This example libiio program is meant to exercise the features of IIO functionality on the AD4020.
+It takes the uri as the only argument. for example : `./ad4020-iiostream ip:192.168.2.1`
+
+## ad7606b-iiostream
+  * Language : C
+
+This example libiio program is meant to exercise the features of IIO functionality on the AD7606B.
+It takes the uri as the only argument. for example : `./ad7606b-iiostream ip:192.168.2.1`
+
+## ad7380-iiostream
+  * Language : C
+
+This example libiio program is meant to exercise the features of IIO functionality on the AD7380.
+It takes the uri as the only argument. for example : `./ad7380-iiostream ip:192.168.2.1`
+
+## ad7381-iiostream
+  * Language : C
+
+This example libiio program is meant to exercise the features of IIO functionality on the AD7381.
+It takes the uri as the only argument. for example : `./ad7381-iiostream ip:192.168.2.1`
+
+## adrv9002-iiostream
+  * Language : C
+
+This example libiio program is meant to exercise the features of IIO functionality on the ADRV9002.
+It takes the uri as the only argument. for example : `./adrv9002-iiostream ip:192.168.2.1`
+
+## ad4696-iiostream
+  * Language : C
+
+This example libiio program is meant to exercise the features of IIO functionality on the AD4696.
+It takes the uri as the only argument. for example : `./ad4696-iiostream ip:192.168.2.1`
+
 ## dummy-iiostream
   * Language : C
 
