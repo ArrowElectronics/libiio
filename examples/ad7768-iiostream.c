@@ -219,7 +219,8 @@ int main (int argc, char **argv)
 	while (!stop)
 	{
 		uint8_t *buf;
-		ssize_t nbytes_rx, bytes, sample;
+		ssize_t nbytes_rx, bytes;
+		long int sample;
 
 		// Refill RX buffer
 		nbytes_rx = iio_buffer_refill(rxbuf);
@@ -227,8 +228,8 @@ int main (int argc, char **argv)
 
 		// Get data format from any one channel
 		const struct iio_data_format *fmt = iio_channel_get_data_format(rxchan);
-		size_t sample_size = fmt->length / 8 * fmt->repeat;
-		printf("Fmt length = %u, fmt repeat = %u, sample size = %u\n", fmt->length, fmt->repeat, sample_size);
+		unsigned long int sample_size = fmt->length / 8 * fmt->repeat;
+		printf("Fmt length = %u, fmt repeat = %u, sample size = %lu\n", fmt->length, fmt->repeat, sample_size);
 
 		// Print each captured sample
 		buf = malloc(sample_size * BUFFER_LENGTH);
@@ -238,9 +239,9 @@ int main (int argc, char **argv)
 		}
 
 		bytes = iio_channel_read_raw(rxchan, rxbuf, buf, sample_size * BUFFER_LENGTH);
-		printf("%s ", iio_channel_get_id(rxchan));
+		printf("%s \n", iio_channel_get_id(rxchan));
 		for (sample = 0; sample < bytes / sample_size; ++sample)
-			printf("%" PRId32 " ", ((int32_t *)buf)[sample] << 8);
+			printf("Buffer Sample: %ld\tCH%d Data: 0x%x\n", sample, CHANNEL_NUMBER, ((int32_t *)buf)[sample] << 8);
 
 		free(buf);
 		printf("\n");
