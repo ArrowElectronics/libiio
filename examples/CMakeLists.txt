@@ -5,6 +5,13 @@ project(ad9371-iiostream C)
 project(adrv9009-iiostream C)
 project(dummy-iiostream C)
 project(adrv9002-iiostream C)
+project(ad7768-iiostream C)
+project(ad7768-1-iiostream C)
+project(ad4020-iiostream C)
+project(ad7606b-iiostream C)
+project(ad7380-iiostream C)
+project(ad7381-iiostream C)
+project(ad4696-iiostream C)
 
 if (APPLE)
     # Add relative rpath to iio library (which is in the same framework)
@@ -41,16 +48,48 @@ add_executable(
 add_executable(
     adrv9002-iiostream adrv9002-iiostream.c ${GETOPT_C_FILE} ${LIBIIO_RC}
 )
-add_executable(dummy-iiostream dummy-iiostream.c ${GETOPT_C_FILE} ${LIBIIO_RC})
+add_executable(
+    dummy-iiostream dummy-iiostream.c ${GETOPT_C_FILE} ${LIBIIO_RC}
+)
+add_executable(
+    ad7768-iiostream ad7768-iiostream.c ${GETOPT_C_FILE} ${LIBIIO_RC}
+)
+add_executable(
+    ad7768-1-iiostream ad7768-1-iiostream.c ${GETOPT_C_FILE} ${LIBIIO_RC}
+)
+add_executable(
+    ad4020-iiostream ad4020-iiostream.c ${GETOPT_C_FILE} ${LIBIIO_RC}
+)
+add_executable(
+    ad7606b-iiostream ad7606b-iiostream.c ${GETOPT_C_FILE} ${LIBIIO_RC}
+)
+add_executable(
+    ad7380-iiostream ad7381-iiostream.c ${GETOPT_C_FILE} ${LIBIIO_RC}
+)
+add_executable(
+    ad7381-iiostream ad7381-iiostream.c ${GETOPT_C_FILE} ${LIBIIO_RC}
+)
+add_executable(
+    ad4696-iiostream ad4696-iiostream.c ${GETOPT_C_FILE} ${LIBIIO_RC}
+)
 
 target_link_libraries(ad9361-iiostream iio)
 target_link_libraries(ad9371-iiostream iio)
 target_link_libraries(adrv9009-iiostream iio)
 target_link_libraries(dummy-iiostream iio)
 target_link_libraries(adrv9002-iiostream iio)
+target_link_libraries(ad7768-iiostream iio)
+target_link_libraries(ad7768-1-iiostream iio)
+target_link_libraries(ad4020-iiostream iio)
+target_link_libraries(ad7606b-iiostream iio)
+target_link_libraries(ad7380-iiostream iio)
+target_link_libraries(ad7381-iiostream iio)
+target_link_libraries(ad4696-iiostream iio)
 
 set(IIO_EXAMPLES_TARGETS ad9361-iiostream ad9371-iiostream adrv9009-iiostream
-                         dummy-iiostream adrv9002-iiostream
+                         dummy-iiostream adrv9002-iiostream ad7768-iiostream
+                         ad7768-1-iiostream ad4020-iiostream ad7606b-iiostream
+                         ad7380-iiostream ad7381-iiostream ad4696-iiostream
 )
 
 find_library(PTHREAD_LIBRARIES pthread)
