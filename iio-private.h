@@ -136,6 +136,10 @@ struct iio_context {
 	const char *name;
 	char *description;
 
+	unsigned int major;
+	unsigned int minor;
+	char *git_tag;
+
 	struct iio_device **devices;
 	unsigned int nb_devices;
 
@@ -196,7 +200,7 @@ struct iio_buffer {
 	uint32_t *mask;
 	unsigned int dev_sample_size;
 	unsigned int sample_size;
-	bool is_output, dev_is_high_speed;
+	bool dev_is_high_speed;
 };
 
 struct iio_context_info {

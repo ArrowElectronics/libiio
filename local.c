@@ -493,10 +493,6 @@ static ssize_t local_get_buffer(const struct iio_device *dev,
 		return ret;
 	}
 
-	/* Requested buffer size is too big! */
-	if (pdata->last_dequeued < 0 && bytes_used > block.size)
-		return -EFBIG;
-
 	pdata->last_dequeued = block.id;
 	*addr_ptr = pdata->addrs[block.id];
 	return (ssize_t) block.bytes_used;
@@ -1476,7 +1472,7 @@ static int add_channel(struct iio_device *dev, const char *name,
 			free(channel_id);
 			ret = add_attr_to_channel(chn, name, path,
 					dir_is_scan_elements);
-			chn->is_scan_element = dir_is_scan_elements && !ret;
+			chn->is_scan_element |= dir_is_scan_elements && !ret;
 			return ret;
 		}
 	}

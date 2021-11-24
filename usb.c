@@ -853,7 +853,7 @@ static struct iio_context * usb_create_context(unsigned int bus,
 	if (ret < 0) {
 		ret = -(int) libusb_to_errno(ret);
 		IIO_ERROR("Unable to get usb device list: %i\n", ret);
-		goto err_destroy_iiod_client;
+		goto err_libusb_exit;
 	}
 
 	usb_dev = NULL;
@@ -928,7 +928,7 @@ static struct iio_context * usb_create_context(unsigned int bus,
 
 	pdata->nb_ep_couples = iface->bNumEndpoints / 2;
 
-	IIO_DEBUG("Found %hhu usable i/o endpoint couples\n", pdata->nb_ep_couples);
+	IIO_DEBUG("Found %hu usable i/o endpoint couples\n", pdata->nb_ep_couples);
 
 	pdata->io_endpoints = calloc(pdata->nb_ep_couples,
 			sizeof(*pdata->io_endpoints));

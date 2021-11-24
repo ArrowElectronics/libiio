@@ -30,8 +30,8 @@ static int add_attr_to_channel(struct iio_channel *chn, xmlNode *n)
 			if (!filename)
 				goto err_free;
 		} else {
-			IIO_WARNING("Unknown field \'%s\' in channel %s\n",
-					attr->name, chn->id);
+			IIO_DEBUG("Unknown field \'%s\' in channel %s\n",
+				  attr->name, chn->id);
 		}
 	}
 
@@ -72,8 +72,8 @@ static int add_attr_to_device(struct iio_device *dev, xmlNode *n, enum iio_attr_
 		if (!strcmp((char *) attr->name, "name")) {
 			name = (char *) attr->children->content;
 		} else {
-			IIO_WARNING("Unknown field \'%s\' in device %s\n",
-					attr->name, dev->id);
+			IIO_DEBUG("Unknown field \'%s\' in device %s\n",
+				  attr->name, dev->id);
 		}
 	}
 
@@ -160,8 +160,8 @@ static int setup_scan_element(struct iio_channel *chn, xmlNode *n)
 			chn->format.with_scale = true;
 			chn->format.scale = value;
 		} else {
-			IIO_WARNING("Unknown attribute \'%s\' in <scan-element>\n",
-					name);
+			IIO_DEBUG("Unknown attribute \'%s\' in <scan-element>\n",
+				  name);
 		}
 	}
 
@@ -198,10 +198,10 @@ static struct iio_channel * create_channel(struct iio_device *dev, xmlNode *n)
 			if (!strcmp(content, "output"))
 				chn->is_output = true;
 			else if (strcmp(content, "input"))
-				IIO_WARNING("Unknown channel type %s\n", content);
+				IIO_DEBUG("Unknown channel type %s\n", content);
 		} else {
-			IIO_WARNING("Unknown attribute \'%s\' in <channel>\n",
-					name);
+			IIO_DEBUG("Unknown attribute \'%s\' in <channel>\n",
+				  name);
 		}
 	}
 
@@ -222,8 +222,8 @@ static struct iio_channel * create_channel(struct iio_device *dev, xmlNode *n)
 			if (err < 0)
 				goto err_free_channel;
 		} else if (strcmp((char *) n->name, "text")) {
-			IIO_WARNING("Unknown children \'%s\' in <channel>\n",
-					n->name);
+			IIO_DEBUG("Unknown children \'%s\' in <channel>\n",
+				  n->name);
 			continue;
 		}
 	}
@@ -264,8 +264,8 @@ static struct iio_device * create_device(struct iio_context *ctx, xmlNode *n)
 			if (!dev->id)
 				goto err_free_device;
 		} else {
-			IIO_WARNING("Unknown attribute \'%s\' in <device>\n",
-					attr->name);
+			IIO_DEBUG("Unknown attribute \'%s\' in <device>\n",
+				  attr->name);
 		}
 	}
 
@@ -309,8 +309,8 @@ static struct iio_device * create_device(struct iio_context *ctx, xmlNode *n)
 			if (err < 0)
 				goto err_free_device;
 		} else if (strcmp((char *) n->name, "text")) {
-			IIO_WARNING("Unknown children \'%s\' in <device>\n",
-					n->name);
+			IIO_DEBUG("Unknown children \'%s\' in <device>\n",
+				  n->name);
 			continue;
 		}
 	}
@@ -383,8 +383,8 @@ static int iio_populate_xml_context_helper(struct iio_context *ctx, xmlNode *roo
 			continue;
 		} else if (strcmp((char *) n->name, "device")) {
 			if (strcmp((char *) n->name, "text"))
-				IIO_WARNING("Unknown children \'%s\' in "
-						"<context>\n", n->name);
+				IIO_DEBUG("Unknown children \'%s\' in "
+					  "<context>\n", n->name);
 			continue;
 		}
 
@@ -407,10 +407,12 @@ static int iio_populate_xml_context_helper(struct iio_context *ctx, xmlNode *roo
 
 static struct iio_context * iio_create_xml_context_helper(xmlDoc *doc)
 {
-	const char *description = NULL;
+	const char *description = NULL, *git_tag = NULL, *content;
 	struct iio_context *ctx;
+	long major = 0, minor = 0;
 	xmlNode *root;
 	xmlAttr *attr;
+	char *end;
 	int err;
 
 	root = xmlDocGetRootElement(doc);
@@ -421,16 +423,41 @@ static struct iio_context * iio_create_xml_context_helper(xmlDoc *doc)
 	}
 
 	for (attr = root->properties; attr; attr = attr->next) {
-		if (!strcmp((char *) attr->name, "description"))
-			description = (const char *)attr->children->content;
-		else if (strcmp((char *) attr->name, "name"))
-			IIO_WARNING("Unknown parameter \'%s\' in <context>\n",
-					(char *) attr->children->content);
+		content = (const char *) attr->children->content;
+
+		if (!strcmp((char *) attr->name, "description")) {
+			description = content;
+		} else if (!strcmp((char *) attr->name, "version-major")) {
+			major = strtol(content, &end, 10);
+			if (*end != '\0')
+				IIO_WARNING("invalid format for major version\n");
+		} else if (!strcmp((char *) attr->name, "version-minor")) {
+			minor = strtol(content, &end, 10);
+			if (*end != '\0')
+				IIO_WARNING("invalid format for minor version\n");
+		} else if (!strcmp((char *) attr->name, "version-git")) {
+			git_tag = content;
+		} else if (strcmp((char *) attr->name, "name")) {
+			IIO_DEBUG("Unknown parameter \'%s\' in <context>\n",
+				  content);
+		}
 	}
 
 	ctx = iio_context_create_from_backend(&xml_backend, description);
 	if (!ctx)
 		return NULL;
+
+	if (git_tag) {
+		ctx->major = major;
+		ctx->minor = minor;
+
+		ctx->git_tag = iio_strdup(git_tag);
+		if (!ctx->git_tag) {
+			iio_context_destroy(ctx);
+			errno = ENOMEM;
+			return NULL;
+		}
+	}
 
 	err = iio_populate_xml_context_helper(ctx, root);
 	if (err) {

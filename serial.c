@@ -355,6 +355,24 @@ static int serial_set_timeout(struct iio_context *ctx, unsigned int timeout)
 	return 0;
 }
 
+static int serial_get_trigger(const struct iio_device *dev,
+			      const struct iio_device **trigger)
+{
+	const struct iio_context *ctx = iio_device_get_context(dev);
+	struct iio_context_pdata *pdata = iio_context_get_pdata(ctx);
+
+	return iiod_client_get_trigger(pdata->iiod_client, NULL, dev, trigger);
+}
+
+static int serial_set_trigger(const struct iio_device *dev,
+			      const struct iio_device *trigger)
+{
+	const struct iio_context *ctx = iio_device_get_context(dev);
+	struct iio_context_pdata *pdata = iio_context_get_pdata(ctx);
+
+	return iiod_client_set_trigger(pdata->iiod_client, NULL, dev, trigger);
+}
+
 static const struct iio_backend_ops serial_ops = {
 	.get_version = serial_get_version,
 	.open = serial_open,
@@ -369,6 +387,8 @@ static const struct iio_backend_ops serial_ops = {
 	.shutdown = serial_shutdown,
 	.get_description = serial_get_description,
 	.set_timeout = serial_set_timeout,
+	.get_trigger = serial_get_trigger,
+	.set_trigger = serial_set_trigger,
 };
 
 static const struct iiod_client_ops serial_iiod_client_ops = {
@@ -549,7 +569,7 @@ static int serial_parse_params(const char *params,
 		return -EINVAL;
 
 	/* 110 baud to 1,000,000 baud */
-	if (params == end || *baud_rate < 110 || *baud_rate > 1000001) {
+	if (params == end || *baud_rate < 110 || *baud_rate > 4000000) {
 		IIO_ERROR("Invalid baud rate\n");
 		return -EINVAL;
 	}

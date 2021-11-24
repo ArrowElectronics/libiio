@@ -37,8 +37,6 @@ if (WITH_AIO)
 			"If you want to disable async. I/O support, set WITH_AIO=OFF.")
 	endif ()
 
-	message(STATUS "Looking for libaio: Found")
-
 	option(WITH_IIOD_USBD "Add support for USB through FunctionFS within IIOD" ON)
 	if (WITH_IIOD_USBD)
 		include(CheckTypeSize)
@@ -53,6 +51,11 @@ if (WITH_AIO)
 
 		set(IIOD_CFILES ${IIOD_CFILES} usbd.c)
 	endif()
+endif()
+
+option(WITH_IIOD_SERIAL "Add serial (UART) support" ON)
+if (WITH_IIOD_SERIAL)
+	set(IIOD_CFILES ${IIOD_CFILES} serial.c)
 endif()
 
 add_executable(iiod ${IIOD_CFILES})
@@ -99,3 +102,13 @@ if (WITH_UPSTART)
 	configure_file(${CMAKE_CURRENT_SOURCE_DIR}/init/iiod.conf.cmakein ${PROJECT_BINARY_DIR}/init/iiod.conf)
 	install(FILES ${PROJECT_BINARY_DIR}/init/iiod.conf DESTINATION ${UPSTART_CONF_INSTALL_DIR})
 endif()
+
+list(APPEND IIOD_FEATURES_${WITH_IIOD_SERIAL} iiod-serial)
+list(APPEND IIOD_FEATURES_${WITH_AIO} iiod-aio)
+list(APPEND IIOD_FEATURES_${WITH_IIOD_USBD} iiod-usb)
+list(APPEND IIOD_FEATURES_${WITH_SYSTEMD} iiod-systemd)
+list(APPEND IIOD_FEATURES_${WITH_SYSVINIT} iiod-sysvinit)
+list(APPEND IIOD_FEATURES_${WITH_UPSTART} iiod-upstart)
+
+set(IIOD_FEATURES_ON "${IIOD_FEATURES_ON}" PARENT_SCOPE)
+set(IIOD_FEATURES_OFF "${IIOD_FEATURES_OFF}" PARENT_SCOPE)
