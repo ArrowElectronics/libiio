@@ -31,7 +31,7 @@
 #define BUFFER_LENGTH 400
 #define CHANNEL_NUMBER 0  		// AD4696 has 16 channels
 
-#define MODE_REG_VAL 1			// 0 = Staggered Mode; 1 = Continuous Mode
+#define MODE_REG_VAL 0			// 0 = Staggered Mode; 1 = Continuous Mode
 
 #define IIO_ENSURE(expr) { \
 	if (!(expr)) { \
@@ -170,7 +170,7 @@ bool cfg_ad4696_streaming_ch(struct iio_context *ctx, struct stream_cfg *cfg, en
  */
 int main (int argc, char **argv)
 {
-	uint32_t reg_val;
+	uint32_t reg_val = 0;
 
 	// Streaming devices
 	struct iio_device *rx;
