@@ -34,7 +34,7 @@
 
 /* helper macros */
 #define BUFFER_LENGTH 400
-#define CHANNEL_NUMBER 4  // AD7768 has eight channels
+#define CHANNEL_NUMBER 0  // AD7768 has eight channels
 
 #define IIO_ENSURE(expr) { \
 	if (!(expr)) { \
@@ -241,7 +241,7 @@ int main (int argc, char **argv)
 		bytes = iio_channel_read_raw(rxchan, rxbuf, buf, sample_size * BUFFER_LENGTH);
 		printf("%s \n", iio_channel_get_id(rxchan));
 		for (sample = 0; sample < bytes / sample_size; ++sample)
-			printf("Buffer Sample: %ld\tCH%d Data: 0x%x\n", sample, CHANNEL_NUMBER, ((int32_t *)buf)[sample] << 8);
+			printf("Buffer Sample: %ld\tCH%d Data: 0x%x\n", sample, CHANNEL_NUMBER, ((int32_t *)buf)[sample] & 0xFFFFFF);
 
 		free(buf);
 		printf("\n");
