@@ -51,7 +51,7 @@
  *            2 = four lanes per channel.
  *            3 = Unsupported
  **/
-#define OUT_DATA_MD 1
+#define OUT_DATA_MD 2
 #define DDR_MD 0
 #define CLK_MD 0
 #define LANE_MD 2
