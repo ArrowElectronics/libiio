@@ -77,6 +77,12 @@ It takes the uri as the only argument. for example : `./adrv9002-iiostream ip:19
 This example libiio program is meant to exercise the features of IIO functionality on the AD4696.
 It takes the uri as the only argument. for example : `./ad4696-iiostream ip:192.168.2.1`
 
+## ad4630-iiostream
+  * Language : C
+
+This example libiio program is meant to exercise the features of IIO functionality on the AD4630.
+It takes the uri as the only argument. for example : `./ad4630-iiostream ip:192.168.2.1`
+
 ## dummy-iiostream
   * Language : C
 
